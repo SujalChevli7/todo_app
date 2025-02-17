@@ -8,31 +8,17 @@ function fetchTasks() {
             taskList.innerHTML = "";
             tasks.forEach(task => {
                 const li = document.createElement("li");
-
-                // Checkbox for marking completion
-                const checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.checked = task.completed;
-                checkbox.classList.add("task-checkbox");
-                checkbox.onclick = () => toggleTask(task.id, task.completed);
-
-                // Task text
-                const taskText = document.createElement("span");
-                taskText.textContent = task.title;
-                taskText.classList.add("task-text");
-                if (task.completed) {
-                    taskText.classList.add("completed"); // Apply strikethrough if completed
-                }
-
-                // Delete button
-                const deleteBtn = document.createElement("button");
-                deleteBtn.classList.add("delete-btn");
-                deleteBtn.textContent = "❌";
-                deleteBtn.onclick = () => deleteTask(task.id);
-
-                li.appendChild(checkbox);
-                li.appendChild(taskText);
-                li.appendChild(deleteBtn);
+                li.classList.add("task-item");
+                
+                // ✅ Add a checkbox input element and strike-through functionality
+                li.innerHTML = `
+                    <div class="task-container">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} onclick="toggleTask(${task.id}, this.checked)">
+                        <span class="task-title ${task.completed ? 'completed' : ''}">${task.title}</span>
+                        <button class="delete-btn" onclick="deleteTask(${task.id})">X</button>
+                    </div>
+                `;
+                
                 taskList.appendChild(li);
             });
         });
@@ -59,7 +45,7 @@ function toggleTask(id, completed) {
     fetch(`/tasks/update/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ completed: !completed })
+        body: JSON.stringify({ completed: completed })
     })
     .then(() => fetchTasks());
 }

@@ -35,11 +35,15 @@ class AddTask(Resource):
 
 class UpdateTask(Resource):
     def put(self, task_id):
-        data = request.get_json()
-        completed = data['completed']
-        cursor.execute("UPDATE tasks SET completed = %s WHERE id = %s", (completed, task_id))
-        db.commit()
-        return jsonify({"message": "Task updated successfully!"})
+        try:
+            data = request.get_json()
+            completed = data['completed']
+            cursor.execute("UPDATE tasks SET completed = %s WHERE id = %s", (completed, task_id))
+            db.commit()
+            return jsonify({"message": "Task updated successfully!"})
+        except Exception as e:
+            db.rollback()
+            return jsonify({"error": str(e)}), 500
 
 class DeleteTask(Resource):
     def delete(self, task_id):
